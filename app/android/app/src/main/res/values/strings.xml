@@ -1,0 +1,3 @@
+<resources>
+    <string name="accessibility_service_description">Lets ScreenGuard notice which app is currently open so it can act the moment one of your limits is reached. It does not read or record screen content.</string>
+</resources>
