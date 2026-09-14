@@ -194,7 +194,34 @@ Before releasing:
    (a key `flutter create` didn't add since AdMob wasn't part of the base
    template) — see AdMob's Flutter quickstart for the exact key.
 
-## 5. Run it
+## 5. App icon
+
+`assets/icon/` has three source images (a modern indigo-gradient hourglass
+mark, matching the in-app theme) and `pubspec.yaml` is already configured
+for the `flutter_launcher_icons` package to turn them into every Android
+mipmap density plus the iOS `AppIcon.appiconset`. After `flutter pub get`:
+
+```bash
+dart run flutter_launcher_icons
+```
+
+That writes real icon files into `android/app/src/main/res/mipmap-*/` and
+`ios/Runner/Assets.xcassets/AppIcon.appiconset/` — nothing else to wire up
+by hand. `assets/icon/icon.png` is the full-bleed icon (used as-is on iOS,
+which rounds it automatically); `icon_background.png` / `icon_foreground.png`
+are the two layers Android's adaptive icons composite separately, so the
+mark stays inside the safe zone whatever mask shape a launcher applies.
+
+To change the color or redraw the mark, edit `TOP_COLOR`/`BOTTOM_COLOR` (or
+the `hourglass_glyph` function) in `tool/generate_icons.py` and rerun:
+
+```bash
+pip install pillow   # if not already installed
+python3 tool/generate_icons.py
+dart run flutter_launcher_icons
+```
+
+## 6. Run it
 
 ```bash
 flutter run   # pick a connected Android device/emulator or iOS simulator/device
@@ -219,4 +246,6 @@ lib/
   widgets/                     total-time card, app row, ad banner
 android/                       Kotlin: usage stats + accessibility-service enforcement
 ios/                           Swift: FamilyControls/DeviceActivity/ManagedSettings
+assets/icon/                   source images for flutter_launcher_icons
+tool/generate_icons.py         regenerates assets/icon/*.png (needs Pillow)
 ```
