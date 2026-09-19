@@ -94,8 +94,17 @@ class AppMonitorAccessibilityService : AccessibilityService() {
 
         if (totalLimit > 0) {
             if (totalUsed >= totalLimit) {
-                if (!MonitorConfigStore.isInReblockCooldown(context, reblockCooldownMinutes)) {
+                val onCooldown = MonitorConfigStore.isInReblockCooldown(context, reblockCooldownMinutes)
+                if (!onCooldown && !isCurrentForegroundExempt()) {
                     MonitorConfigStore.setPendingBlockReason(context, "total")
+                    // Start the cooldown the moment we act, not only once the user
+                    // manages to acknowledge the block screen. Without this, a user
+                    // who can't reach BlockScreen in time (e.g. it keeps sending them
+                    // Home before they can respond) would get re-blocked on every
+                    // ~20s tick and every app switch, with no way out short of Safe
+                    // Mode. This bounds it to firing at most once per cooldown window
+                    // regardless of whether it was ever acknowledged.
+                    MonitorConfigStore.setLastUnblockNow(context)
                     performGlobalAction(GLOBAL_ACTION_HOME)
                     launchBlockScreen()
                 }
@@ -113,6 +122,17 @@ class AppMonitorAccessibilityService : AccessibilityService() {
         }
 
         updateStatusNotification(totalUsed)
+    }
+
+    /**
+     * Never force the user Home while they're in Settings (trying to grant
+     * permissions or turn this very service off) or already in ScreenGuard
+     * itself. An unknown foreground package is treated as exempt too, so a
+     * brief gap in tracking never causes an unwanted action.
+     */
+    private fun isCurrentForegroundExempt(): Boolean {
+        val pkg = currentForegroundPackage ?: return true
+        return pkg == packageName || pkg.contains("settings", ignoreCase = true)
     }
 
     private fun launchBlockScreen() {

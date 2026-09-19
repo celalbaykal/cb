@@ -81,6 +81,9 @@ object MonitorConfigStore {
         return value
     }
 
+    // Called both when the block screen is acknowledged AND the moment a block
+    // action is taken, so the reblock cooldown always starts immediately —
+    // never only contingent on the user managing to acknowledge it.
     fun setLastUnblockNow(context: Context) {
         prefs(context).edit().putLong(KEY_LAST_UNBLOCK, System.currentTimeMillis()).apply()
     }
