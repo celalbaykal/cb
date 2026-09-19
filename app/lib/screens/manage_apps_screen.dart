@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../models/installed_app.dart';
-import '../models/tracked_app.dart';
 import '../services/platform_bridge.dart';
 import 'edit_app_limit_screen.dart';
 
