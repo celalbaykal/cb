@@ -7,7 +7,11 @@ plugins {
 android {
     namespace = "com.screenguard.app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Deliberately not pinning ndkVersion: this app has no native C/C++ code
+    // of its own, and forcing a specific NDK here just makes Gradle try to
+    // auto-download it — which can fail on some machines/SDK tool versions
+    // for reasons unrelated to this app. Leave it to whatever's installed
+    // (or not installed, since nothing here needs it).
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
